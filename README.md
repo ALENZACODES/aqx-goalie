@@ -15,7 +15,7 @@
 * Waiting costs the league about **14 standings points every season** (about 0.43 per team), and 98% of that comes from pulling too late, not too early.
 * From the moment the model says pull while down 1, pulling then instead of at the NHL median raises the chance of getting at least a point from 19.1% to 20.3% and expected standings points from 0.292 to 0.313 per game.
 
-**Live dashboard:** open `docs/index.html` through any static host (GitHub Pages serves the `docs/` folder as is). Pick a score, a clock and a team and the bench tool says PULL NOW or WAIT, with the value of each choice.
+**Live dashboard:** https://alenzacodes.github.io/aqx-goalie/ (GitHub Pages serves the `docs/` folder as is; any static host works). Pick a score, a clock and a team and the bench tool says PULL NOW or WAIT, with the value of each choice.
 
 ## What is in here
 

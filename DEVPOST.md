@@ -1,16 +1,20 @@
-# Devpost submission draft: AQX Sports Analytics Data Bowl 4.0
+# Devpost submission: AQX Sports Analytics Data Bowl 4.0
+
+Hackathon: https://aqxanalyticsfour.devpost.com/
 
 **Project name:** Pull the Goalie Sooner?
 
-**Tagline (under 200 characters):** NHL coaches pull the goalie almost two minutes too late. A backtested model of 6,762 games says when to pull, and a bench tool answers in one click.
+**Elevator pitch / tagline (under 200 characters):** NHL coaches pull the goalie almost two minutes too late. A backtested model of 6,762 games says when to pull, and a bench tool answers in one click.
 
-**Links to add on submit:**
-* GitHub repo: https://github.com/<john-account>/pull-the-goalie (to create)
-* Live demo: https://<john-account>.github.io/pull-the-goalie/ (GitHub Pages from the docs folder)
+**Links ("Try it out"):**
+* Live demo (working prototype): https://alenzacodes.github.io/aqx-goalie/
+* Source code (GitHub, MIT License): https://github.com/ALENZACODES/aqx-goalie
 
 **Built with:** python, numpy, pandas, matplotlib, scikit-learn, javascript, html, css, nhl-api, github-pages
 
-**Gallery images (docs/img):** cover.png, hist_down1.png, curve_down1.png, calibration.png, buckets_down1.png, trend.png, teams.png, plus a screenshot of the bench tool.
+**Image gallery (upload in this order):** submission/dashboard.png (live dashboard screenshot), docs/img/cover.png, docs/img/hist_down1.png, docs/img/curve_down1.png, docs/img/calibration.png, docs/img/buckets_down1.png, docs/img/trend.png, docs/img/teams.png
+
+**Video demo:** not required for this hackathon.
 
 ---
 
@@ -21,7 +25,7 @@ Every hockey fan has yelled "pull the goalie!" at the TV. Analysts have argued f
 ## What it does
 
 * **Answers the question.** Down 1, the best time to pull is **3:42 left** (90% range 3:13 to 4:13). Down 2, it is **6:21 left** (5:05 to 7:55). The NHL median is 1:57 and 3:03.
-* **Measures the gap.** Of 2,261 pulls while down 1 since 2021, about 1 in 100 came at the right time or earlier. Late pulls cost the league about 14 standings points every season, roughly half a point per team, which is the margin in a playoff race.
+* **Measures the gap.** Of 2,261 pulls while down 1 since 2021, about 1 in 100 came at the right time or earlier. Late pulls cost the league about 14 standings points every season, about 0.43 points per team, and 98% of that comes from pulling too late rather than too early. Races for the last playoff spot are often decided by a single point.
 * **Bench tool.** Pick down 1, 2 or 3, the time left, regular season or playoffs, and a team. It says PULL NOW or WAIT and shows the expected points for pulling now, at the best time and at the NHL median, plus a chart of every possible pull time.
 * **Every team.** A sortable table with each club's own best pull time, how they actually pull, their 6 on 5 scoring and allowing rates, and the points they lost per 82 games.
 * **Live and replay.** A small server reads any live NHL game and gives the call for both benches. It can also rewind a finished game to any moment, and a stream overlay shows the model's call next to a viewer vote.
@@ -64,6 +68,11 @@ I fit every goal rate on 2021-22 to 2024-25 only, then scored 5,168 game states 
 ## What I learned
 
 The case for pulling earlier is not that 6 on 5 is good. It is that a 2 goal loss and a 1 goal loss are worth the same zero points, so giving up an empty net goal costs almost nothing while scoring the tying goal is worth a point and a half.
+
+## Try it
+
+* Live dashboard: https://alenzacodes.github.io/aqx-goalie/
+* Code, data pipeline and tests: https://github.com/ALENZACODES/aqx-goalie
 
 ## What's next
 
