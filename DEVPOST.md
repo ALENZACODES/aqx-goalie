@@ -12,7 +12,7 @@ Hackathon: https://aqxanalyticsfour.devpost.com/
 
 **Built with:** python, numpy, pandas, matplotlib, scikit-learn, javascript, html, css, nhl-api, github-pages
 
-**Image gallery (upload in this order):** submission/dashboard.png (live dashboard screenshot), docs/img/cover.png, docs/img/hist_down1.png, docs/img/curve_down1.png, docs/img/calibration.png, docs/img/buckets_down1.png, docs/img/trend.png, docs/img/teams.png
+**Image gallery (upload in this order):** submission/dashboard.png (live dashboard), submission/bench_tool.png (bench tool saying PULL NOW down 1 at 3:30 left), docs/img/cover.png, docs/img/hist_down1.png, docs/img/curve_down1.png, docs/img/calibration.png, docs/img/buckets_down1.png, docs/img/trend.png, docs/img/teams.png. A full page capture is in submission/dashboard_full.png if wanted.
 
 **Video demo:** not required for this hackathon.
 
