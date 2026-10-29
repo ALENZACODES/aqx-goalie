@@ -1,0 +1,14 @@
+[project]
+name = "pullgoalie"
+version = "1.0.0"
+description = "When should a trailing NHL team pull its goalie? A backtested Markov model on the public NHL feed."
+authors = [{ name = "John Khan" }]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pandas>=2.0", "matplotlib>=3.7", "scikit-learn>=1.3"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,24 @@
+:root{--navy:#0B1B3B;--red:#C8102E;--ice:#EAF3FA;--blue:#7FB3D5;--grey:#5B6475;--line:#d9e1ea}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#13203a;background:#fff}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.hero{background:linear-gradient(160deg,var(--navy),#16336b);color:#fff;padding:48px 0 36px}
+.kicker{text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;opacity:.8;margin:0}
+h1{font-size:clamp(2rem,5vw,3.2rem);margin:.2em 0}.lede{max-width:720px;font-size:1.1rem;opacity:.95}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:24px}
+.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:16px}
+.big{font-size:2.4rem;font-weight:800;line-height:1}.sub{opacity:.8;font-size:.9rem;margin-top:6px}
+section{padding:36px 0;border-bottom:1px solid var(--line)}h2{font-size:1.6rem;margin:.2em 0 .4em;color:var(--navy)}
+.tool{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;background:var(--ice);border-radius:14px;padding:20px}
+@media(max-width:760px){.tool{grid-template-columns:1fr}}
+.controls label{display:block;margin-bottom:14px;font-weight:600}.controls select,.controls input{display:block;width:100%;margin-top:6px;font:inherit;padding:6px}
+.answer{background:#fff;border-radius:12px;padding:18px;text-align:center}
+.verdict{font-size:3rem;font-weight:900;letter-spacing:.04em}.verdict.pull{color:var(--red)}.verdict.wait{color:var(--navy)}
+.verdictSub{color:var(--grey);margin-bottom:10px}
+table.mini{width:100%;border-collapse:collapse}table.mini td{padding:6px;border-top:1px solid var(--line);text-align:left}table.mini td+td{text-align:right;font-weight:700}
+figure{margin:18px 0}figure img{width:100%;border:1px solid var(--line);border-radius:10px}figcaption{color:var(--grey);font-size:.92rem;margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.chart svg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px}
+table.data{border-collapse:collapse;width:100%;font-size:.93rem;margin:12px 0}table.data th,table.data td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+table.data th:first-child,table.data td:first-child{text-align:left}table.data th{background:var(--ice);cursor:default}
+table.sortable th{cursor:pointer}.scroll{overflow-x:auto}
+.method li{margin-bottom:8px}footer{background:var(--navy);color:#fff;padding:22px 0;font-size:.9rem}

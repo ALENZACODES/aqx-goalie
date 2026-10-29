@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pull the Goalie Sooner? NHL goalie pull timing, backtested</title>
+<meta name="description" content="When should a trailing NHL team pull its goalie? A win probability model built on 6,700+ NHL games from the public play by play feed, backtested on seasons it never saw.">
+<meta name="author" content="John Khan">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%227%22 fill=%22%230B1B3B%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">NHL analytics · built from the public play by play feed</p>
+    <h1>Pull the Goalie Sooner?</h1>
+    <p class="lede">Every NHL coach who trails late has to decide when the goalie comes out. I tracked every pull in <b id="nGames">6,700+</b> games since 2021 and built a model of the last ten minutes. The answer is yes, and by a lot.</p>
+    <div class="cards">
+      <div class="card"><div class="big" id="c1">3:42</div><div>best time to pull when <b>down 1</b></div><div class="sub">NHL median: <b id="m1">1:57</b></div></div>
+      <div class="card"><div class="big" id="c2">6:21</div><div>best time to pull when <b>down 2</b></div><div class="sub">NHL median: <b id="m2">3:03</b></div></div>
+      <div class="card"><div class="big" id="c3">14</div><div>standings points the league leaves on the ice every season</div><div class="sub"><span id="c3b">98%</span> of it from waiting too long</div></div>
+      <div class="card"><div class="big" id="c4">1%</div><div>of pulls while down 1 come at the right time or earlier</div><div class="sub">across <span id="c4b">2,261</span> real pulls</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="tool">
+  <h2>The bench tool</h2>
+  <p>Pick a game state. The model tells you whether to pull now or how long to wait, and what each choice is worth.</p>
+  <div class="tool">
+    <div class="controls">
+      <label>Score
+        <select id="deficit"><option value="-1">Down 1</option><option value="-2">Down 2</option><option value="-3">Down 3</option></select></label>
+      <label>Time left in regulation: <b id="tLabel">4:00</b>
+        <input id="tLeft" type="range" min="10" max="600" step="5" value="240"></label>
+      <label>Game type
+        <select id="mode"><option value="points">Regular season (standings points)</option><option value="win">Playoffs (win chance)</option></select></label>
+      <label>Team (6 on 5 history)
+        <select id="team"><option value="">League average</option></select></label>
+    </div>
+    <div class="answer">
+      <div id="verdict" class="verdict">WAIT</div>
+      <div id="verdictSub" class="verdictSub"></div>
+      <table class="mini">
+        <tr><td>Pull right now</td><td id="vNow"></td></tr>
+        <tr><td>Pull at the best time</td><td id="vBest"></td></tr>
+        <tr><td>Pull at the NHL median time</td><td id="vMed"></td></tr>
+      </table>
+    </div>
+  </div>
+  <figure class="chart">
+    <svg id="curve" viewBox="0 0 760 300" role="img" aria-label="Value of each pull time"></svg>
+    <figcaption id="curveCap">Expected result from this moment for every possible pull time. Higher is better.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What six seasons of pulls say</h2>
+  <div class="grid2">
+    <figure><img src="img/hist_down1.png" alt="Histogram of NHL pull times when down by one, nearly all after the best window"><figcaption>When down 1, the typical NHL pull comes about 1:45 later than the model's best time. The blue band is the 90% range once you account for uncertainty in the goal rates.</figcaption></figure>
+    <figure><img src="img/curve_down1.png" alt="Points lost versus pull time when down by one"><figcaption>Cost of each pull time when down 1 with 10:00 left. Waiting until the NHL median costs about <b id="costMed">1.4</b> standings points per 100 such games compared with the best time.</figcaption></figure>
+    <figure><img src="img/curve_down2.png" alt="Points lost versus pull time when down by two"><figcaption>Down 2 the curve is flatter but the best time is much earlier, a little over six minutes.</figcaption></figure>
+    <figure><img src="img/trend.png" alt="Median pull times by season"><figcaption>Coaches have moved about ten seconds earlier since 2021. The gap to the best time is still close to two minutes when down 1 and over three when down 2.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Does it hold up on games it never saw?</h2>
+  <p>I fit every goal rate on 2021-22 through 2024-25 only, then scored the model on every 2025-26 and 2026-27 game where a team trailed by one or two goals at eight checkpoints in the last ten minutes. The model never sees outcomes; it only knows goal rates, the clock and when that team actually pulled.</p>
+  <div class="grid2">
+    <figure><img src="img/calibration.png" alt="Calibration chart of predicted versus actual"><figcaption id="calCap"></figcaption></figure>
+    <figure><img src="img/buckets_down1.png" alt="Comeback rate by pull time"><figcaption>Real comeback rate for teams down 1 with 3:00 left, grouped by when they pulled. Teams that waited past 1:30 tied the game about half as often. Part of the lowest bar is teams that could not pull because they were short handed.</figcaption></figure>
+  </div>
+  <table class="data" id="btTable"></table>
+</section>
+
+<section>
+  <h2>Every team</h2>
+  <p>Team specific best times use each club's own 6 on 5 goals for and against from <span id="teamSeasons"></span>, blended with the league rate because a team only plays well under an hour a season at 6 on 5. Treat team differences as a nudge, not a verdict. Click a heading to sort.</p>
+  <div class="scroll"><table class="data sortable" id="teamTable"></table></div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <ol class="method">
+    <li><b>Data.</b> Every regular season game from 2021-22 to today from the NHL's public feed (api-web.nhle.com). Each event carries a situation code that says how many skaters and goalies each side has, so I can see the exact moment a goalie leaves.</li>
+    <li><b>Clean pulls.</b> Delayed penalty extra attackers look like pulls in the data. Any goalie out stretch that ends with a penalty on the other team within 75 seconds is removed.</li>
+    <li><b>Goal rates.</b> Third period goals for and against per 60 minutes, split by score and by whether the goalie is in or out. Pulling down 1 lifts a team's scoring from <span id="r1">2.5</span> to <span id="r2">6.9</span> goals per 60, while goals against jump from <span id="r3">2.1</span> to <span id="r4">20.3</span>.</li>
+    <li><b>Model.</b> A second by second Markov chain over the score and the clock, solved backwards from the final horn. In the regular season a tie is worth a point plus a coin flip in overtime, so it optimises standings points; the playoff mode optimises win chance.</li>
+    <li><b>Uncertainty.</b> 400 draws of every goal rate from its posterior, re solved each time, give the 90% range on the best pull time.</li>
+    <li><b>Backtest and cost.</b> Out of sample calibration as above, then each real decision is priced as points lost versus the best policy from that exact moment.</li>
+  </ol>
+  <h3>Robustness</h3>
+  <table class="data" id="sensTable"></table>
+  <h3>Limits</h3>
+  <p>The model treats both teams as league average unless you pick a team, ignores which zone the faceoff is in, and assumes the coach can pull at any second. Real coaches wait for possession or an offensive zone draw, which is one reason to start looking for the moment a little before the best time, not after it.</p>
+</section>
+</main>
+<footer><div class="wrap">Built by John Khan, Toronto, Ontario, for the AQX Sports Analytics Data Bowl 4.0. Data from the NHL public play by play feed. Code under the MIT License.</div></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
