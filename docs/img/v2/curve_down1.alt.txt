@@ -1,0 +1,1 @@
+U-shaped curve of standings points lost per 100 games by goalie pull time when trailing by one with 10:00 left, with a 90% uncertainty band. The minimum is at 3:42 left (90% range 4:13 to 3:13). The NHL median pull at 1:57 costs about 1.4 points per 100 games.

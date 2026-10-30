@@ -1,0 +1,1 @@
+Line chart of the NHL median goalie pull time by season from 2021-22 to 2026-27. Down one it moved from 1:54 to 2:03 against a best time of 3:42; down two from 2:56 to 3:04 against 6:21. The last season is partial.

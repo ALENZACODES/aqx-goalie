@@ -1,0 +1,1 @@
+Histogram of 1,524 NHL goalie pulls while trailing by two, on a game clock from 10:00 to 0:00. The model's best window, 7:55 to 5:05 left, is shaded and nearly empty; the typical pull comes at 3:03, 3:18 after the best time of 6:21. 16 pulls (1.0%) came within 10 seconds of the best time, or earlier. The last bar on the left holds every pull at 9:45 or earlier.

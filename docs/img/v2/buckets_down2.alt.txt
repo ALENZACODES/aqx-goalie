@@ -1,0 +1,1 @@
+Dot plot of the share of teams trailing by two with 5:00 left that tied or won, grouped by when the goalie came out, with 95% ranges, against the model's expectation. 4:00 to 5:00: 3.2% real, 4.0% model, n=190. 3:00 to 3:59: 4.3% real, 3.8% model, n=510. 2:00 to 2:59: 4.3% real, 3.5% model, n=486. under 2:00 or never: 1.2% real, 2.4% model, n=258.

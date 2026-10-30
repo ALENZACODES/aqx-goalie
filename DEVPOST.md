@@ -12,7 +12,9 @@ Hackathon: https://aqxanalyticsfour.devpost.com/
 
 **Built with:** python, numpy, pandas, matplotlib, scikit-learn, javascript, html, css, nhl-api, github-pages
 
-**Image gallery (upload in this order):** submission/dashboard.png (live dashboard), submission/bench_tool.png (bench tool saying PULL NOW down 1 at 3:30 left), docs/img/cover.png, docs/img/hist_down1.png, docs/img/curve_down1.png, docs/img/calibration.png, docs/img/buckets_down1.png, docs/img/trend.png, docs/img/teams.png. A full page capture is in submission/dashboard_full.png if wanted.
+**Thumbnail (3:2):** docs/img/v2/cover.png
+
+**Image gallery (upload in this order):** docs/img/v2/cover.png, docs/img/hero.png (every down 1 pull against the best window), submission/dashboard.png (live dashboard), submission/bench_tool.png (bench tool saying PULL NOW down 1 at 3:30 left), docs/img/v2/curve_down1.png, docs/img/v2/calibration.png, docs/img/v2/buckets_down1.png, docs/img/v2/trend.png, docs/img/v2/teams.png, docs/img/v2/sensitivity.png. A full page capture is in submission/dashboard_full.png if wanted.
 
 **Video demo:** not required for this hackathon.
 
@@ -25,7 +27,7 @@ Every hockey fan has yelled "pull the goalie!" at the TV. Analysts have argued f
 ## What it does
 
 * **Answers the question.** Down 1, the best time to pull is **3:42 left** (90% range 3:13 to 4:13). Down 2, it is **6:21 left** (5:05 to 7:55). The NHL median is 1:57 and 3:03.
-* **Measures the gap.** Of 2,261 pulls while down 1 since 2021, about 1 in 100 came at the right time or earlier. Late pulls cost the league about 14 standings points every season, about 0.43 points per team, and 98% of that comes from pulling too late rather than too early. Races for the last playoff spot are often decided by a single point.
+* **Measures the gap.** Of 2,261 pulls while down 1 since 2021, 29, about 1 in 100, came within 10 seconds of the best time or earlier. Late pulls cost the league about 13 standings points every season, about 0.40 points per team, and 98% of that comes from pulling too late rather than too early. Races for the last playoff spot are often decided by a single point.
 * **Bench tool.** Pick down 1, 2 or 3, the time left, regular season or playoffs, and a team. It says PULL NOW or WAIT and shows the expected points for pulling now, at the best time and at the NHL median, plus a chart of every possible pull time.
 * **Every team.** A sortable table with each club's own best pull time, how they actually pull, their 6 on 5 scoring and allowing rates, and the points they lost per 82 games.
 * **Live and replay.** A small server reads any live NHL game and gives the call for both benches. It can also rewind a finished game to any moment, and a stream overlay shows the model's call next to a viewer vote.
@@ -51,7 +53,7 @@ I fit every goal rate on 2021-22 to 2024-25 only, then scored 5,168 game states 
 ## Actionable impact
 
 * **For a coach:** a pocket rule. Down 1, start looking for the pull at about 4:00 and have the goalie out by 3:40. Down 2, by about 6:20. In the playoffs, add about 15 seconds.
-* **For a front office:** a cost in standings points for each team's habits, so the conversation is "this is worth about half a point a year for free", not "analytics says so".
+* **For a front office:** a cost in standings points for each team's habits, so the conversation is "this is worth up to half a point a year for free", not "analytics says so".
 * **For broadcasters and fans:** a live call that can sit on screen in the last ten minutes of any game.
 
 ## Challenges I ran into

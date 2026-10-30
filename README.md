@@ -2,7 +2,7 @@
 
 **When should a trailing NHL team pull its goalie?** I tracked every goalie pull in 6,762 NHL regular season games since 2021 using the league's public play by play feed, built a second by second model of the last ten minutes, and backtested it on games it never saw.
 
-![Cover](docs/img/cover.png)
+![NHL coaches pull the goalie 1:45 too late](docs/img/hero.png)
 
 | | Best time to pull | NHL median | 90% range |
 |---|---|---|---|
@@ -11,9 +11,9 @@
 | Down 1, playoffs | **3:58 left** | | |
 | Down 2, playoffs | **6:35 left** | | |
 
-* About **1 in 100** pulls while down 1 comes at the right time or earlier.
-* Waiting costs the league about **14 standings points every season** (about 0.43 per team), and 98% of that comes from pulling too late, not too early.
-* From the moment the model says pull while down 1, pulling then instead of at the NHL median raises the chance of getting at least a point from 19.1% to 20.3% and expected standings points from 0.292 to 0.313 per game.
+* About **1 in 100** pulls while down 1 (29 of 2,261) comes within 10 seconds of the best time, or earlier.
+* Waiting costs the league about **13 standings points every season** (about 0.40 per team), and 98% of that comes from pulling too late, not too early.
+* From the moment the model says pull while down 1, pulling then instead of at the NHL median raises the chance of getting at least a point from 19.1% to 20.3% and expected standings points from 0.293 to 0.313 per game.
 
 **Live dashboard:** https://alenzacodes.github.io/aqx-goalie/ (GitHub Pages serves the `docs/` folder as is; any static host works). Pick a score, a clock and a team and the bench tool says PULL NOW or WAIT, with the value of each choice.
 
@@ -22,7 +22,10 @@
 ```
 scripts/fetch_games.py     downloads play by play from api-web.nhle.com, one gzipped file per season
 scripts/run_analysis.py    goal rates, optimal pull times, uncertainty, backtests, team table, docs/data/results.json
-scripts/make_charts.py     every chart in docs/img
+scripts/make_hero.py       the hero chart in docs/img (desktop, phone and SVG)
+scripts/make_charts_v2.py  every chart in docs/img/v2, with alt text in docs/img/v2/alt.json
+scripts/make_cover.py      the cover and thumbnail in docs/img/v2
+scripts/chartstyle.py      shared palette, fonts and helpers for the chart scripts
 src/pullgoalie/parse.py    situation codes to time segments, goalie pull detection, delayed penalty filter
 src/pullgoalie/model.py    the Markov chain, backward induction, fixed policy grids, live recommend()
 src/pullgoalie/analysis.py exposure tables and backtest states
@@ -39,7 +42,9 @@ Python 3.10 or newer.
 pip install -r requirements.txt
 python scripts/fetch_games.py          # about 2 minutes per season, roughly 17 MB in total
 python scripts/run_analysis.py --rebuild
-python scripts/make_charts.py
+python scripts/make_hero.py
+python scripts/make_charts_v2.py
+python scripts/make_cover.py
 python -m pytest -q
 cd docs && python -m http.server 8000  # then open http://localhost:8000
 ```
@@ -65,15 +70,17 @@ All goal rates were fit on 2021-22 to 2024-25 only. The test set is every 2025-2
 | Same model, everyone pulls at the league median | 0.1394 | 0.4369 | 0.685 |
 | Lookup table of past comeback rates by score and clock | 0.1391 | 0.4360 | 0.685 |
 
-* Average predicted chance of getting at least a point was 17.3% against 18.2% observed, and every decile sits close to the diagonal (`docs/img/calibration.png`).
+* Average predicted chance of getting at least a point was 17.3% against 18.2% observed, and every decile sits close to the diagonal (`docs/img/v2/calibration.png`).
 * Knowing when a team actually pulled makes the model better than a lookup table that ignores timing. That is direct evidence that pull timing changes outcomes in the way the model says.
 * In the raw data, teams down 1 with 3:00 left who waited until under 1:30 to pull came back 6% to 10% of the time. Teams that pulled with 1:30 or more left came back about 20% of the time.
 
-![Pull times](docs/img/hist_down1.png)
-![Cost curve](docs/img/curve_down1.png)
-![Calibration](docs/img/calibration.png)
-![By pull time](docs/img/buckets_down1.png)
-![Trend](docs/img/trend.png)
+![Pull times](docs/img/v2/hist_down1.png)
+![Cost curve](docs/img/v2/curve_down1.png)
+![Cost curve, down 2](docs/img/v2/curve_down2.png)
+![Calibration](docs/img/v2/calibration.png)
+![By pull time](docs/img/v2/buckets_down1.png)
+![Trend](docs/img/v2/trend.png)
+![Every team](docs/img/v2/teams.png)
 
 ## Robustness
 

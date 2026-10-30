@@ -1,0 +1,1 @@
+Horizontal bar chart ranking all 32 NHL teams by standings points lost to late goalie pulls per 82 games, 2024-25 to 2026-27. WPG loses the most at 0.58, DAL the least at 0.20; the league average is 0.38.

@@ -1,0 +1,1 @@
+Calibration plot of predicted against observed chance of getting at least a point, 10 bins with 95% ranges, all close to the diagonal from 0.02 to 0.31. Fit on 2021-22 to 2024-25, tested on 2025-26 and 2026-27. Predicted 17.3%, observed 18.2%. Brier 0.1385 against a baseline of 0.1391; AUC 0.690 against 0.685.
