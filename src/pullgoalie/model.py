@@ -84,32 +84,57 @@ def optimal_pull_times(PULL):
 def value_at(V, t, d):
     return float(V[int(round(t)), int(d) - D_MIN])
 
+def optimal_thresholds(rates: dict, mode: str = "points", p_ot: float = 0.5) -> dict:
+    """{deficit: seconds left at which pulling becomes optimal} from the full solve."""
+    _, PULL = solve(rates, mode, p_ot)
+    return optimal_pull_times(PULL)
+
 def curve(rates, d, mode="points", p_ot=0.5, start=600, step=5):
-    """Expected value at `start` seconds left, trailing by d, for each pull time."""
+    """Expected value at `start` seconds left, trailing by d, for each pull time T.
+    The team pulls at T while trailing by d and follows the optimal rule at every
+    other deficit (for example, down 2 it pulls at T; if it scores it puts the goalie
+    back in until the down-1 threshold). This makes the curve's maximum coincide with
+    the optimal pull time for d."""
+    opt = optimal_thresholds(rates, mode, p_ot)
     xs, ys = [], []
     for T in range(0, start + 1, step):
-        V, _ = solve(rates, mode, p_ot, horizon=start, policy=_policy_for(d, T))
+        V, _ = solve(rates, mode, p_ot, horizon=start, policy=_policy_for(d, T, opt))
         xs.append(T); ys.append(value_at(V, start, d))
     return xs, ys
 
-def _policy_for(d, T):
-    """Pull at T seconds left whenever trailing (any deficit)."""
-    return {k: T for k in range(D_MIN, 0)}
+def _policy_for(d, T, opt=None):
+    """Pull at T seconds left when trailing by d. Other deficits use the optimal
+    thresholds `opt` when given, otherwise T as well (the old behaviour)."""
+    pol = {k: T for k in range(D_MIN, 0)}
+    if opt is not None:
+        pol.update({int(k): int(v) for k, v in opt.items() if k < 0})
+        pol[int(d)] = T
+    return pol
 
-def policy_grid(rates: dict, Ts, mode: str = "points", p_ot: float = 0.5, horizon: int = 600):
-    """Values for many fixed policies at once. Policy j pulls at Ts[j] seconds left whenever
-    trailing. Returns array (horizon+1, len(Ts), NS) of values with the goalie in."""
+def policy_grid(rates: dict, Ts, mode: str = "points", p_ot: float = 0.5, horizon: int = 600,
+                d: int | None = None, opt: dict | None = None):
+    """Values for many fixed policies at once. Policy j pulls at Ts[j] seconds left.
+    With d and opt given, Ts[j] applies only when trailing by d and the other deficits
+    follow the optimal thresholds opt; otherwise Ts[j] applies whenever trailing.
+    Returns array (horizon+1, len(Ts), NS) of values with the goalie in."""
     gf, ga = rate_arrays(rates)
     Ts = np.asarray(Ts, float)[:, None]
     up = np.r_[np.arange(1, NS), NS - 1]; dn = np.r_[0, np.arange(0, NS - 1)]
     trailing = (DS < 0)[None, :]
+    if d is not None and opt is not None:
+        thr = np.repeat(Ts, NS, axis=1)                       # (len(Ts), NS)
+        for i, dd in enumerate(DS):
+            if dd < 0 and int(dd) != int(d):
+                thr[:, i] = opt.get(int(dd), opt[min(opt)])
+    else:
+        thr = Ts
     V = np.zeros((horizon + 1, len(Ts), NS))
     V[0] = terminal(mode, p_ot)[None, :]
     for t in range(1, horizon + 1):
         prev = V[t - 1]
         c0 = gf[0] * prev[:, up] + ga[0] * prev[:, dn] + (1 - gf[0] - ga[0]) * prev
         c1 = gf[1] * prev[:, up] + ga[1] * prev[:, dn] + (1 - gf[1] - ga[1]) * prev
-        V[t] = np.where(trailing & (t <= Ts), c1, c0)
+        V[t] = np.where(trailing & (t <= thr), c1, c0)
     return V
 
 def recommend(rates: dict, seconds_left: float, deficit: int, mode: str = "points", p_ot: float = 0.5):
@@ -120,7 +145,8 @@ def recommend(rates: dict, seconds_left: float, deficit: int, mode: str = "point
     _, PULL = solve(rates, mode, p_ot)
     t_star = optimal_pull_times(PULL)[d]
     h = max(1, int(round(seconds_left)))
-    pol = lambda T: {k: T for k in range(D_MIN, 0)}
+    opt = optimal_pull_times(PULL)
+    pol = lambda T: _policy_for(d, T, opt)
     if h > PERIOD:
         return {"action": "WAIT", "pull_at": t_star, "seconds_until": h - t_star}
     v_now = value_at(solve(rates, mode, p_ot, horizon=h, policy=pol(h))[0], h, d)

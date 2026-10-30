@@ -31,9 +31,21 @@ function terminal(mode, pOT) {
   return v;
 }
 
-// policy: null for optimal, or a number T meaning "pull at T seconds left while trailing".
+// policy: null for optimal; a number T meaning "pull at T seconds left whenever trailing";
+// or an object {deficit: T} with a pull time per deficit (deficits below the most
+// negative key reuse that key), which is what policyFor() builds.
+function thresholds(policy) {
+  const thr = new Float64Array(NS).fill(-1);
+  if (policy === null) return null;
+  if (typeof policy === "number") { for (let d = D_MIN; d < 0; d++) thr[idx(d)] = policy; return thr; }
+  const keys = Object.keys(policy).map(Number).sort((a, b) => a - b);
+  for (let d = D_MIN; d < 0; d++) thr[idx(d)] = policy[d] !== undefined ? policy[d] : policy[keys[0]];
+  return thr;
+}
+
 export function solve(rates, { mode = "points", pOT = 0.5, horizon = 1200, policy = null } = {}) {
   const { gf, ga } = perSecond(rates);
+  const thr = thresholds(policy);
   const V = [terminal(mode, pOT)], PULL = [new Uint8Array(NS)];
   for (let t = 1; t <= horizon; t++) {
     const prev = V[t - 1], cur = new Float64Array(NS), pull = new Uint8Array(NS);
@@ -42,7 +54,7 @@ export function solve(rates, { mode = "points", pOT = 0.5, horizon = 1200, polic
       const c = [0, 1].map((a) => gf[a][i] * prev[up] + ga[a][i] * prev[dn] + (1 - gf[a][i] - ga[a][i]) * prev[i]);
       const d = i + D_MIN;
       let p = 0;
-      if (d < 0) p = policy === null ? (c[1] >= c[0] - 1e-15 ? 1 : 0) : (t <= policy ? 1 : 0);
+      if (d < 0) p = thr === null ? (c[1] >= c[0] - 1e-15 ? 1 : 0) : (t <= thr[i] ? 1 : 0);
       pull[i] = p; cur[i] = c[p];
     }
     V.push(cur); PULL.push(pull);
@@ -57,11 +69,25 @@ export function optimalPullTime(rates, d, opts = {}) {
   return PULL.length - 1;
 }
 
+// Best pull time for every deficit, as a policy object.
+export function optimalPolicy(rates, opts = {}) {
+  const pol = {};
+  for (let d = D_MIN; d < 0; d++) pol[d] = optimalPullTime(rates, d, opts);
+  return pol;
+}
+
+// "Pull at T when trailing by d, and follow the best rule at every other deficit."
+// Down 2 this means: pull at T; if you score, the goalie goes back in until the
+// down-1 best time. The maximum of a curve built this way is the best time for d.
+export function policyFor(rates, d, T, opts = {}) {
+  return { ...optimalPolicy(rates, opts), [d]: T };
+}
+
 // Expected value at `start` seconds left, trailing by d, for each pull time.
 export function pullCurve(rates, d, { start = 600, step = 5, ...opts } = {}) {
-  const out = [];
+  const out = [], base = optimalPolicy(rates, opts);
   for (let T = 0; T <= start; T += step) {
-    const { value } = solve(rates, { ...opts, horizon: start, policy: T });
+    const { value } = solve(rates, { ...opts, horizon: start, policy: { ...base, [d]: T } });
     out.push([T, value(start, d)]);
   }
   return out;
@@ -70,10 +96,11 @@ export function pullCurve(rates, d, { start = 600, step = 5, ...opts } = {}) {
 // One call answer for a live game state. Used by the dashboard and a future chat overlay.
 export function recommend(rates, { secondsLeft, deficit, mode = "points", pOT = 0.5 }) {
   if (deficit >= 0) return { action: "STAY", reason: "Not trailing" };
-  const Tstar = optimalPullTime(rates, Math.max(deficit, D_MIN), { mode, pOT });
+  const d = Math.max(deficit, D_MIN);
+  const Tstar = optimalPullTime(rates, d, { mode, pOT });
   const h = Math.max(secondsLeft, 1);
-  const now = solve(rates, { mode, pOT, horizon: h, policy: h }).value(h, deficit);
-  const best = solve(rates, { mode, pOT, horizon: h, policy: Math.min(Tstar, h) }).value(h, deficit);
+  const now = solve(rates, { mode, pOT, horizon: h, policy: policyFor(rates, d, h, { mode, pOT }) }).value(h, deficit);
+  const best = solve(rates, { mode, pOT, horizon: h, policy: policyFor(rates, d, Math.min(Tstar, h), { mode, pOT }) }).value(h, deficit);
   return {
     action: secondsLeft <= Tstar ? "PULL" : "WAIT",
     pullAt: Tstar,

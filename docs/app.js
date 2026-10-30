@@ -1,4 +1,4 @@
-import { solve, optimalPullTime, fmtClock } from "./pullgoalie.js";
+import { solve, optimalPullTime, optimalPolicy, fmtClock } from "./pullgoalie.js";
 
 const $ = (id) => document.getElementById(id);
 const R = await (await fetch("data/results.json")).json();
@@ -18,9 +18,9 @@ const rate = (d, p) => R.rates.find((r) => r.d === d && r.pulled === p);
 $("r1").textContent = rate(-1, 0).gf60.toFixed(1); $("r2").textContent = rate(-1, 1).gf60.toFixed(1);
 $("r3").textContent = rate(-1, 0).ga60.toFixed(1); $("r4").textContent = rate(-1, 1).ga60.toFixed(1);
 {
-  const c = R.curves["-1"], best = Math.max(...c.points);
-  const i = c.T.findIndex((t) => t >= med["-1"]);
-  $("costMed").textContent = ((best - c.points[i]) * 100).toFixed(1);
+  const c = R.curves["-1"], best = Math.max(...c.points), m = med["-1"];
+  const i = c.T.findIndex((t) => t >= m), j = Math.max(i - 1, 0), w = c.T[i] === c.T[j] ? 0 : (m - c.T[j]) / (c.T[i] - c.T[j]);
+  $("costMed").textContent = ((best - (c.points[j] + w * (c.points[i] - c.points[j]))) * 100).toFixed(1);
 }
 
 // bench tool
@@ -36,8 +36,8 @@ const cache = new Map();
 function curveFor(rates, key, d, start, mode) {
   const k = `${key}|${d}|${start}|${mode}`;
   if (cache.has(k)) return cache.get(k);
-  const out = [];
-  for (let T = 0; T <= start; T += 5) out.push([T, solve(rates, { mode, horizon: start, policy: T }).value(start, d)]);
+  const out = [], base = optimalPolicy(rates, { mode });
+  for (let T = 0; T <= start; T += 5) out.push([T, solve(rates, { mode, horizon: start, policy: { ...base, [d]: T } }).value(start, d)]);
   cache.set(k, out); return out;
 }
 function fmtVal(v, mode) { return mode === "points" ? `${v.toFixed(3)} pts` : pct(v); }
@@ -52,7 +52,8 @@ function update() {
   v.textContent = pullNow ? "PULL NOW" : "WAIT"; v.className = `verdict ${pullNow ? "pull" : "wait"}`;
   const tsLabel = Tstar >= 1200 ? "any time in the third" : `${fmtClock(Tstar)} left`;
   $("verdictSub").textContent = pullNow ? `Best time to pull here is ${tsLabel}. You are already inside it.` : `Pull at ${tsLabel}, ${fmtClock(t - Tstar)} from now.`;
-  const value = (T) => solve(rates, { mode, horizon: t, policy: Math.min(T, t) }).value(t, d);
+  const base = optimalPolicy(rates, { mode });
+  const value = (T) => solve(rates, { mode, horizon: t, policy: { ...base, [d]: Math.min(T, t) } }).value(t, d);
   const medT = d === -1 ? med["-1"] : d === -2 ? med["-2"] : 254;
   $("vNow").textContent = fmtVal(value(t), mode);
   $("vBest").textContent = fmtVal(value(Tstar), mode);

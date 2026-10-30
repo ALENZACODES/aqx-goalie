@@ -109,16 +109,22 @@ def main():
     res["median_pull"] = {"-1": float(P[P["diff"] == -1].pull_remaining.median()), "-2": float(P[P["diff"] == -2].pull_remaining.median())}
 
     # value curves (points at 10:00 left) with posterior band
-    G = policy_grid(r_all, TS, "points", p_ot, H)
+    # pull at T when trailing by d, optimal rule at every other deficit, so the
+    # curve's maximum is the optimal pull time for d
     curves = {}
+    G_by_d = {}
     sub = draws[:120]
-    band = {d: [] for d in (-1, -2)}
-    for dr in sub:
-        g2 = policy_grid(dr, TS[::5], "points", p_ot, H)
-        for d in (-1, -2): band[d].append(g2[H, :, ix(d)] - g2[H, :, ix(d)].max())
     for d in (-1, -2):
+        opt_d = {int(k): int(v) for k, v in opt["points"].items()}
+        G = policy_grid(r_all, TS, "points", p_ot, H, d=d, opt=opt_d)
+        G_by_d[d] = G
+        band = []
+        for dr in sub:
+            _, P_dr = solve(dr, "points", p_ot)
+            g2 = policy_grid(dr, TS[::5], "points", p_ot, H, d=d, opt=optimal_pull_times(P_dr))
+            band.append(g2[H, :, ix(d)] - g2[H, :, ix(d)].max())
         y = G[H, ::5, ix(d)]
-        b = np.array(band[d])
+        b = np.array(band)
         curves[str(d)] = {"T": TS[::5].tolist(), "points": y.round(5).tolist(),
                           "regret_lo": np.percentile(b, 5, axis=0).round(5).tolist(),
                           "regret_hi": np.percentile(b, 95, axis=0).round(5).tolist()}
@@ -173,10 +179,10 @@ def main():
     res["buckets_down2"] = buckets(S, 300, -2, [0, 120, 180, 240, 301], ["under 2:00 or never", "2:00 to 2:59", "3:00 to 3:59", "4:00 to 5:00"])
 
     # backtest C: standings points left on the table, every team, every season
-    Gpts = G
     Vopt, _ = solve(r_all, "points", p_ot, horizon=H)
     rows = []
     for dd in (-1, -2):
+        Gpts = G_by_d[dd]  # pull at T when trailing by dd, best rule at every other deficit
         ck = int(round(Tstar[dd] / 10) * 10)
         late = S[(S.checkpoint == ck) & (S["diff"] == dd)]
         for r in late.itertuples():
