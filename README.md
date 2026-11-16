@@ -121,3 +121,20 @@ The server exposes `/today`, `/state?game=ID`, `/vote?game=ID&choice=pull|wait&u
 Data from the NHL's public play by play feed at api-web.nhle.com. NHL and team names are trademarks of their owners; this project is independent and not endorsed by the NHL.
 
 Built by John Khan, Toronto, Ontario. MIT License.
+
+## Project structure
+
+```text
+aqx-goalie/
+├── docs/             # Dashboard site served by GitHub Pages (44 files)
+├── scripts/          # Data fetch, analysis and chart scripts (6 files)
+├── src/              # The pullgoalie model package (5 files)
+├── submission/       # Submission screenshots (3 files)
+├── tests/            # Automated tests (2 files)
+├── .gitignore
+├── DEVPOST.md        # Submission write-up
+├── LICENSE           # Licence
+├── pyproject.toml    # Python project settings
+├── README.md         # This file
+└── requirements.txt  # Python dependencies
+```
